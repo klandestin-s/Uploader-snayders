@@ -34,7 +34,7 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        overflow-x: hidden; /* Mencegah horizontal scroll */
+        overflow-x: hidden;
       }
 
       .container {
@@ -46,7 +46,7 @@
         max-width: 900px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 0 auto; /* Memastikan container di tengah */
+        margin: 0 auto;
       }
 
       header {
@@ -221,6 +221,9 @@
         flex-direction: column;
         gap: 20px;
         animation: fadeIn 0.5s ease;
+        /* Perubahan utama: Konten hasil upload di tengah */
+        justify-content: center;
+        align-items: center;
       }
 
       @keyframes fadeIn {
@@ -234,12 +237,12 @@
         }
       }
 
-      /* PERBAIKAN UTAMA: Layout vertikal untuk semua elemen hasil */
       .file-details {
         display: flex;
         flex-direction: column;
         gap: 15px;
         width: 100%;
+        max-width: 400px; /* Lebar maksimal untuk konten hasil */
       }
 
       .detail-card {
@@ -272,6 +275,7 @@
         flex-direction: column;
         gap: 10px;
         width: 100%;
+        max-width: 400px; /* Lebar maksimal untuk konten hasil */
         border: 1px solid rgba(59, 130, 246, 0.3);
       }
 
@@ -283,6 +287,7 @@
         padding: 8px 0;
         font-size: 0.95rem;
         line-height: 1.5;
+        text-align: center;
       }
 
       .link-box a:hover {
@@ -483,6 +488,7 @@
         display: flex;
         gap: 15px;
         width: 100%;
+        max-width: 400px; /* Lebar maksimal untuk tombol */
         margin-top: 15px;
       }
 
@@ -512,7 +518,7 @@
         }
       }
 
-      /* Responsif untuk mobile - Perbaikan Utama */
+      /* Responsif untuk mobile */
       @media (max-width: 480px) {
         body {
           padding: 10px;
@@ -609,6 +615,12 @@
           padding: 15px;
           font-size: 0.8rem;
         }
+        
+        /* Penyesuaian tambahan untuk hasil upload */
+        .file-details,
+        .link-box {
+          max-width: 100%;
+        }
       }
     </style>
   </head>
@@ -655,7 +667,6 @@
             </div>
 
             <div class="result-content" id="resultContent">
-              <!-- Layout Vertikal Baru -->
               <div class="file-details">
                 <div class="detail-card">
                   <h3>Nama File</h3>
