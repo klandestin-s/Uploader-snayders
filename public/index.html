@@ -488,7 +488,7 @@
               <div class="api-copy-section">
                 <h3><i class="fas fa-code"></i> API Upload Endpoint</h3>
                 <div class="api-box">
-                  <span id="apiEndpoint">https://uploader-snayders.vercel.app//api/upload</span>
+                  <span id="apiEndpoint">https://api-upload-cyan.vercel.app/api/upload</span>
                   <button class="copy-api-btn" id="copyApiEndpoint"><i class="fas fa-copy"></i> Salin API</button>
                 </div>
                 <p style="font-size: 0.9rem; color: var(--gray); margin-top: 10px">Gunakan endpoint ini untuk integrasi dengan aplikasi lain</p>
@@ -569,19 +569,11 @@
           navigator.clipboard
             .writeText(apiUrl)
             .then(() => {
-              toast.textContent = "Link API berhasil disalin!";
-              toast.classList.add("show");
-              setTimeout(() => {
-                toast.classList.remove("show");
-              }, 3000);
+              showToast("Link API berhasil disalin!");
             })
             .catch((err) => {
               console.error("Gagal menyalin: ", err);
-              toast.textContent = "Gagal menyalin!";
-              toast.classList.add("show");
-              setTimeout(() => {
-                toast.classList.remove("show");
-              }, 3000);
+              showToast("Gagal menyalin!");
             });
         });
 
@@ -603,7 +595,7 @@
           }
         }
 
-        // Fungsi untuk mengunggah file
+        // Fungsi untuk mengunggah file (VERSI DIPERBAIKI)
         async function uploadFile() {
           const file = fileInput.files[0];
           if (!file) return;
@@ -613,70 +605,55 @@
           initialState.style.display = "none";
           uploadBtn.disabled = true;
 
-          // Baca file sebagai base64
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            const base64 = reader.result.split(",")[1];
+          try {
+            // Baca file sebagai ArrayBuffer (binary murni)
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
 
-            try {
-              // Kirim ke API
-              const response = await axios.post(
-                "https://api-upload-cyan.vercel.app/api/upload",
-                {
-                  fileName: file.name,
-                  content: base64,
-                },
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
+            // Kirim ke API sebagai binary data
+            const response = await axios.post("https://api-upload-cyan.vercel.app/api/upload", uint8Array, {
+              headers: {
+                "Content-Type": "application/octet-stream",
+                "x-filename": file.name, // Header yang diperlukan
+              },
+            });
 
-              // Sembunyikan loading
-              loading.classList.remove("active");
+            // Sembunyikan loading
+            loading.classList.remove("active");
 
-              // Tampilkan hasil
-              const data = response.data.data;
-              resultFileName.textContent = data.fileName;
-              resultExtension.textContent = data.extension;
-              resultLink.textContent = data.url;
-              resultLink.href = data.url;
+            // Tampilkan hasil
+            const data = response.data.data;
+            resultFileName.textContent = data.fileName;
+            resultExtension.textContent = data.extension;
+            resultLink.textContent = data.url;
+            resultLink.href = data.url;
 
-              resultContent.classList.add("active");
-            } catch (error) {
-              // Sembunyikan loading
-              loading.classList.remove("active");
+            resultContent.classList.add("active");
+          } catch (error) {
+            // Sembunyikan loading
+            loading.classList.remove("active");
 
-              // Tampilkan pesan error
-              toast.textContent = `Error: ${error.response?.data?.error || error.message}`;
-              toast.classList.add("show");
-              setTimeout(() => {
-                toast.classList.remove("show");
-              }, 3000);
-
-              uploadBtn.disabled = false;
+            // Tampilkan pesan error
+            let errorMessage = "Terjadi kesalahan saat mengunggah";
+            if (error.response) {
+              errorMessage = error.response.data.error || error.response.data.detail || errorMessage;
+            } else if (error.message) {
+              errorMessage = error.message;
             }
-          };
-
-          reader.readAsDataURL(file);
+            showToast(`Error: ${errorMessage}`);
+            uploadBtn.disabled = false;
+          }
         }
 
         // Fungsi untuk menyalin tautan
         function copyLink() {
-          const textarea = document.createElement("textarea");
-          textarea.value = resultLink.href;
-          document.body.appendChild(textarea);
-          textarea.select();
-          document.execCommand("copy");
-          document.body.removeChild(textarea);
-
-          // Tampilkan toast notifikasi
-          toast.textContent = "Tautan berhasil disalin ke clipboard!";
-          toast.classList.add("show");
-          setTimeout(() => {
-            toast.classList.remove("show");
-          }, 3000);
+          navigator.clipboard
+            .writeText(resultLink.href)
+            .then(() => showToast("Tautan berhasil disalin!"))
+            .catch((err) => {
+              console.error("Gagal menyalin:", err);
+              showToast("Gagal menyalin tautan!");
+            });
         }
 
         // Fungsi untuk reset form
@@ -695,6 +672,13 @@
           const sizes = ["Bytes", "KB", "MB", "GB"];
           const i = Math.floor(Math.log(bytes) / Math.log(k));
           return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        // Fungsi untuk menampilkan toast
+        function showToast(message) {
+          toast.textContent = message;
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 3000);
         }
       });
     </script>
