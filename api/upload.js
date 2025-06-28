@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
 
       return res.status(200).json({
         success: 200,
-        author: 'Yudzxml',
+        author: 'klandestin-s',
         data: {
           message: 'File berhasil diupload ke GitHub',
           fileName: newFileName,
