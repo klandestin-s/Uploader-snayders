@@ -229,51 +229,7 @@
         }
       }
 
-      .link-box {
-        background: rgba(15, 23, 42, 0.8);
-        border-radius: 10px;
-        padding: 15px;
-        display: flex;
-        align-items: center;
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        gap: 10px;
-        width: 100%;
-      }
-
-      .link-box a {
-        color: var(--primary);
-        text-decoration: none;
-        flex-grow: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding: 8px 0;
-      }
-
-      .link-box a:hover {
-        text-decoration: underline;
-      }
-
-      .copy-btn {
-        background: rgba(59, 130, 246, 0.2);
-        color: var(--primary);
-        border: none;
-        border-radius: 8px;
-        padding: 10px 15px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        flex-shrink: 0;
-        min-width: 110px;
-      }
-
-      .copy-btn:hover {
-        background: rgba(59, 130, 246, 0.3);
-      }
-
-      /* PERUBAHAN UTAMA: Layout file-details diubah menjadi vertikal */
+      /* PERBAIKAN UTAMA: Layout vertikal untuk semua elemen hasil */
       .file-details {
         display: flex;
         flex-direction: column;
@@ -285,9 +241,9 @@
         background: rgba(15, 23, 42, 0.6);
         border-radius: 10px;
         padding: 15px;
-        text-align: center;
         border: 1px solid rgba(255, 255, 255, 0.05);
-        width: 100%; /* Tambahkan agar memenuhi lebar */
+        width: 100%;
+        text-align: left;
       }
 
       .detail-card h3 {
@@ -300,6 +256,57 @@
         font-size: 1.1rem;
         font-weight: 600;
         color: white;
+        word-break: break-all;
+      }
+
+      .link-box {
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .link-box a {
+        color: var(--primary);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 8px 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .link-box a:hover {
+        text-decoration: underline;
+      }
+
+      .link-actions {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .copy-btn {
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        flex: 1;
+      }
+
+      .copy-btn:hover {
+        background: rgba(59, 130, 246, 0.3);
       }
 
       .loading {
@@ -467,7 +474,6 @@
         flex-grow: 1;
       }
 
-      /* PERUBAHAN: Layout tombol vertikal pada mobile */
       .action-buttons {
         display: flex;
         gap: 15px;
@@ -480,12 +486,7 @@
         flex: 1;
       }
 
-      @media (max-width: 480px) {
-        .action-buttons {
-          flex-direction: column;
-        }
-      }
-
+      /* Perbaikan untuk desktop: tinggi otomatis */
       @media (min-width: 769px) {
         .content {
           align-items: stretch;
@@ -503,6 +504,27 @@
 
         .result-box {
           min-height: 300px;
+        }
+      }
+
+      /* Responsif untuk mobile */
+      @media (max-width: 480px) {
+        .action-buttons,
+        .link-actions {
+          flex-direction: column;
+        }
+        
+        h1 {
+          font-size: 2rem;
+        }
+        
+        .upload-area {
+          padding: 20px 15px;
+        }
+        
+        .content {
+          padding: 20px 15px;
+          gap: 20px;
         }
       }
     </style>
@@ -550,26 +572,43 @@
             </div>
 
             <div class="result-content" id="resultContent">
-              <!-- PERUBAHAN: Layout vertikal untuk detail file -->
+              <!-- Layout Vertikal Baru -->
               <div class="file-details">
                 <div class="detail-card">
                   <h3>Nama File</h3>
                   <p id="resultFileName">-</p>
                 </div>
+                
                 <div class="detail-card">
                   <h3>Ekstensi</h3>
                   <p id="resultExtension">-</p>
                 </div>
+                
+                <div class="detail-card">
+                  <h3>Ukuran File</h3>
+                  <p id="resultFileSize">-</p>
+                </div>
+                
+                <div class="detail-card">
+                  <h3>Tipe File</h3>
+                  <p id="resultFileType">-</p>
+                </div>
               </div>
 
               <div class="link-box">
+                <h3 style="color: var(--primary); margin-bottom: 5px;">Tautan File:</h3>
                 <a href="#" target="_blank" id="resultLink">-</a>
-                <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
+                
+                <div class="link-actions">
+                  <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
+                  <button class="copy-btn" id="openBtn" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">
+                    <i class="fas fa-external-link-alt"></i> Buka File
+                  </button>
+                </div>
               </div>
 
               <div class="action-buttons">
                 <button class="upload-btn" id="newUploadBtn"><i class="fas fa-plus"></i> Upload Baru</button>
-                <button class="upload-btn" id="viewFileBtn" style="background: var(--success)"><i class="fas fa-eye"></i> Lihat File</button>
               </div>
             </div>
           </div>
@@ -598,12 +637,16 @@
         const resultContent = document.getElementById("resultContent");
         const resultFileName = document.getElementById("resultFileName");
         const resultExtension = document.getElementById("resultExtension");
+        const resultFileSize = document.getElementById("resultFileSize");
+        const resultFileType = document.getElementById("resultFileType");
         const resultLink = document.getElementById("resultLink");
         const copyBtn = document.getElementById("copyBtn");
+        const openBtn = document.getElementById("openBtn");
         const newUploadBtn = document.getElementById("newUploadBtn");
-        const viewFileBtn = document.getElementById("viewFileBtn");
         const toast = document.getElementById("toast");
         const initialState = document.getElementById("initialState");
+
+        let currentFile = null;
 
         // Event Listeners
         browseBtn.addEventListener("click", () => fileInput.click());
@@ -634,20 +677,20 @@
 
         uploadBtn.addEventListener("click", uploadFile);
         copyBtn.addEventListener("click", copyLink);
-        newUploadBtn.addEventListener("click", resetForm);
-        viewFileBtn.addEventListener("click", () => {
+        openBtn.addEventListener("click", () => {
           window.open(resultLink.href, "_blank");
         });
+        newUploadBtn.addEventListener("click", resetForm);
 
         // Fungsi untuk menangani pemilihan file
         function handleFileSelect() {
           if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
+            currentFile = fileInput.files[0];
 
             // Update file info
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            fileType.textContent = file.type || "Unknown";
+            fileName.textContent = currentFile.name;
+            fileSize.textContent = formatFileSize(currentFile.size);
+            fileType.textContent = currentFile.type || "Unknown";
 
             // Tampilkan info file
             fileInfo.classList.add("active");
@@ -659,8 +702,7 @@
 
         // Fungsi untuk mengunggah file
         async function uploadFile() {
-          const file = fileInput.files[0];
-          if (!file) return;
+          if (!currentFile) return;
 
           // Tampilkan loading
           loading.classList.add("active");
@@ -669,14 +711,14 @@
 
           try {
             // Baca file sebagai ArrayBuffer (binary murni)
-            const arrayBuffer = await file.arrayBuffer();
+            const arrayBuffer = await currentFile.arrayBuffer();
             const uint8Array = new Uint8Array(arrayBuffer);
 
             // Kirim ke API sebagai binary data
             const response = await axios.post("https://uploader-snayders.vercel.app/api/upload", uint8Array, {
               headers: {
                 "Content-Type": "application/octet-stream",
-                "x-filename": file.name, // Header yang diperlukan
+                "x-filename": currentFile.name, // Header yang diperlukan
               },
             });
 
@@ -687,6 +729,8 @@
             const data = response.data.data;
             resultFileName.textContent = data.fileName;
             resultExtension.textContent = data.extension;
+            resultFileSize.textContent = formatFileSize(currentFile.size);
+            resultFileType.textContent = currentFile.type || "Unknown";
             resultLink.textContent = data.url;
             resultLink.href = data.url;
 
@@ -721,6 +765,7 @@
         // Fungsi untuk reset form
         function resetForm() {
           fileInput.value = "";
+          currentFile = null;
           fileInfo.classList.remove("active");
           uploadBtn.disabled = true;
           resultContent.classList.remove("active");
