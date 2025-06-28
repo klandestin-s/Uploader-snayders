@@ -44,6 +44,13 @@
       body.success-bg {
         background: linear-gradient(135deg, #10b981, #3b82f6, #10b981);
       }
+      body {
+        transition: background 1s ease;
+      }
+
+      body.success-bg {
+        background: linear-gradient(135deg, #10b981, #3b82f6);
+      }
 
       .container {
         background: var(--card-bg);
@@ -892,10 +899,12 @@
           fileInfo.classList.remove("active");
           uploadBtn.disabled = true;
           resultContent.classList.remove("active");
-          document.querySelector(".upload-section").style.display = "";
           document.querySelector(".content").classList.remove("full-width");
+          document.querySelector(".upload-section").style.display = "";
+          document.body.classList.remove("success-bg");
           initialState.style.display = "flex";
         }
+
         // Fungsi untuk format ukuran file
         function formatFileSize(bytes) {
           if (bytes === 0) return "0 Bytes";
