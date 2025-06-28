@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'GITHUB_TOKEN belum diset di environment variables' });
     }
 
-    const repoOwner = 'Yudzxml';
-    const repoName = 'UploaderV2';
+    const repoOwner = 'klandestin-s';
+    const repoName = 'Cloud_v2';
     const branch = 'main';
     const folderName = 'tmp';
     const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderName}/${newFileName}`;
