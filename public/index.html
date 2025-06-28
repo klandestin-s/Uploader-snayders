@@ -846,9 +846,9 @@
             resultFileType.textContent = currentFile.type || "Unknown";
             resultLink.textContent = data.url;
             resultLink.href = data.url;
-
             resultContent.classList.add("active");
             document.querySelector(".content").classList.add("full-width");
+            document.querySelector(".upload-section").style.display = "none";
           } catch (error) {
             // Sembunyikan loading
             loading.classList.remove("active");
@@ -883,6 +883,7 @@
           fileInfo.classList.remove("active");
           uploadBtn.disabled = true;
           resultContent.classList.remove("active");
+          document.querySelector(".upload-section").style.display = "";
           document.querySelector(".content").classList.remove("full-width");
           initialState.style.display = "flex";
         }
