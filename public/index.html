@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub File Uploader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+      :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --gray: #94a3b8;
+        --card-bg: rgba(15, 23, 42, 0.85);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1e3a8a, #7e22ce, #1e3a8a);
+        color: var(--light);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 900px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      header {
+        background: rgba(9, 14, 30, 0.9);
+        padding: 25px;
+        text-align: center;
+        border-bottom: 2px solid var(--primary);
+        position: relative;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+      }
+
+      .tagline {
+        font-size: 1.1rem;
+        opacity: 0.8;
+        margin-top: 5px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .content {
+        padding: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .upload-section {
+        background: rgba(30, 41, 59, 0.7);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .result-section {
+        background: rgba(30, 41, 59, 0.7);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--primary);
+      }
+
+      h2 i {
+        font-size: 1.5rem;
+      }
+
+      .upload-area {
+        border: 3px dashed var(--primary);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(15, 23, 42, 0.4);
+      }
+
+      .upload-area:hover {
+        background: rgba(59, 130, 246, 0.1);
+        transform: translateY(-3px);
+      }
+
+      .upload-area i {
+        font-size: 4rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+      }
+
+      .upload-area p {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      .file-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .file-info.active {
+        display: block;
+      }
+
+      .upload-btn {
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        padding: 14px 25px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5);
+        background: linear-gradient(to right, var(--primary-dark), #7c3aed);
+      }
+
+      .upload-btn:disabled {
+        background: #4b5563;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .result-box {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .result-box p {
+        text-align: center;
+        font-size: 1.1rem;
+        color: var(--gray);
+      }
+
+      .result-content {
+        width: 100%;
+        display: none;
+      }
+
+      .result-content.active {
+        display: block;
+      }
+
+      .link-box {
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .link-box a {
+        color: var(--primary);
+        text-decoration: none;
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 10px;
+      }
+
+      .link-box a:hover {
+        text-decoration: underline;
+      }
+
+      .copy-btn {
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--primary);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .copy-btn:hover {
+        background: rgba(59, 130, 246, 0.3);
+      }
+
+      .file-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .detail-card {
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .detail-card h3 {
+        font-size: 0.9rem;
+        color: var(--gray);
+        margin-bottom: 8px;
+      }
+
+      .detail-card p {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .loading {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+      }
+
+      .loading.active {
+        display: flex;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(59, 130, 246, 0.2);
+        border-top: 5px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      footer {
+        text-align: center;
+        padding: 25px;
+        color: var(--gray);
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(59, 130, 246, 0.2);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--success);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 1000;
+        font-weight: 500;
+      }
+
+      .toast.show {
+        display: block;
+        animation: fadeInOut 3s ease-in-out;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          bottom: 0;
+        }
+        10% {
+          opacity: 1;
+          bottom: 20px;
+        }
+        90% {
+          opacity: 1;
+          bottom: 20px;
+        }
+        100% {
+          opacity: 0;
+          bottom: 0;
+        }
+      }
+
+      .info-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .api-copy-section {
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .api-copy-section h3 {
+        color: var(--primary);
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+      }
+
+      .api-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .api-box span {
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        font-family: monospace;
+        color: var(--gray);
+      }
+
+      .copy-api-btn {
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--primary);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+
+      .copy-api-btn:hover {
+        background: rgba(59, 130, 246, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="info-badge"><i class="fas fa-code-branch"></i> v2.1</div>
+        <h1><i class="fas fa-cloud-upload-alt"></i> GitHub File Uploader</h1>
+        <p class="tagline">Unggah file Anda dan dapatkan tautan yang dapat dibagikan secara instan</p>
+      </header>
+
+      <div class="content">
+        <div class="upload-section">
+          <h2><i class="fas fa-file-upload"></i> Unggah File</h2>
+
+          <div class="upload-area" id="dropArea">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Seret & lepas file di sini atau</p>
+            <button class="upload-btn" id="browseBtn">Pilih File</button>
+            <input type="file" id="fileInput" />
+          </div>
+
+          <div class="file-info" id="fileInfo">
+            <p><strong>File dipilih:</strong> <span id="fileName">-</span></p>
+            <p><strong>Ukuran:</strong> <span id="fileSize">-</span></p>
+            <p><strong>Tipe:</strong> <span id="fileType">-</span></p>
+          </div>
+
+          <button class="upload-btn" id="uploadBtn" disabled><i class="fas fa-upload"></i> Upload ke GitHub</button>
+        </div>
+
+        <div class="result-section">
+          <h2><i class="fas fa-link"></i> Hasil Upload</h2>
+
+          <div class="result-box">
+            <div class="loading" id="loading">
+              <div class="spinner"></div>
+              <p>Mengunggah file Anda ke GitHub...</p>
+            </div>
+
+            <div id="initialState">
+              <i class="fas fa-file-download" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px"></i>
+              <p>File yang diunggah akan muncul di sini<br />dengan tautan yang dapat disalin</p>
+            </div>
+
+            <div class="result-content" id="resultContent">
+              <div class="file-details">
+                <div class="detail-card">
+                  <h3>Nama File</h3>
+                  <p id="resultFileName">-</p>
+                </div>
+                <div class="detail-card">
+                  <h3>Ekstensi</h3>
+                  <p id="resultExtension">-</p>
+                </div>
+              </div>
+
+              <div class="link-box">
+                <a href="#" target="_blank" id="resultLink">-</a>
+                <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
+              </div>
+
+              <!-- Bagian API Copy di Hasil Upload -->
+              <div class="api-copy-section">
+                <h3><i class="fas fa-code"></i> API Upload Endpoint</h3>
+                <div class="api-box">
+                  <span id="apiEndpoint">https://api-upload-cyan.vercel.app/api/upload</span>
+                  <button class="copy-api-btn" id="copyApiEndpoint"><i class="fas fa-copy"></i> Salin API</button>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--gray); margin-top: 10px">Gunakan endpoint ini untuk integrasi dengan aplikasi lain</p>
+              </div>
+
+              <div style="margin-top: 25px; text-align: center">
+                <button class="upload-btn" id="newUploadBtn"><i class="fas fa-plus"></i> Upload File Baru</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>&copy; 2025 GitHub File Uploader | Dibuat dengan <i class="fas fa-heart" style="color: #ef4444"></i> Snayderstore</p>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Elemen DOM
+        const dropArea = document.getElementById("dropArea");
+        const fileInput = document.getElementById("fileInput");
+        const browseBtn = document.getElementById("browseBtn");
+        const fileInfo = document.getElementById("fileInfo");
+        const fileName = document.getElementById("fileName");
+        const fileSize = document.getElementById("fileSize");
+        const fileType = document.getElementById("fileType");
+        const uploadBtn = document.getElementById("uploadBtn");
+        const loading = document.getElementById("loading");
+        const resultContent = document.getElementById("resultContent");
+        const resultFileName = document.getElementById("resultFileName");
+        const resultExtension = document.getElementById("resultExtension");
+        const resultLink = document.getElementById("resultLink");
+        const copyBtn = document.getElementById("copyBtn");
+        const newUploadBtn = document.getElementById("newUploadBtn");
+        const toast = document.getElementById("toast");
+        const initialState = document.getElementById("initialState");
+        const copyApiEndpoint = document.getElementById("copyApiEndpoint");
+        const apiEndpoint = document.getElementById("apiEndpoint");
+
+        // Event Listeners
+        browseBtn.addEventListener("click", () => fileInput.click());
+
+        fileInput.addEventListener("change", handleFileSelect);
+
+        dropArea.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropArea.style.borderColor = "#8b5cf6";
+          dropArea.style.backgroundColor = "rgba(139, 92, 246, 0.1)";
+        });
+
+        dropArea.addEventListener("dragleave", () => {
+          dropArea.style.borderColor = "#3b82f6";
+          dropArea.style.backgroundColor = "rgba(15, 23, 42, 0.4)";
+        });
+
+        dropArea.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropArea.style.borderColor = "#3b82f6";
+          dropArea.style.backgroundColor = "rgba(15, 23, 42, 0.4)";
+
+          if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect();
+          }
+        });
+
+        uploadBtn.addEventListener("click", uploadFile);
+        copyBtn.addEventListener("click", copyLink);
+        newUploadBtn.addEventListener("click", resetForm);
+
+        // Event untuk tombol salin endpoint API
+        copyApiEndpoint.addEventListener("click", () => {
+          const apiUrl = apiEndpoint.textContent;
+          navigator.clipboard
+            .writeText(apiUrl)
+            .then(() => {
+              toast.textContent = "Link API berhasil disalin!";
+              toast.classList.add("show");
+              setTimeout(() => {
+                toast.classList.remove("show");
+              }, 3000);
+            })
+            .catch((err) => {
+              console.error("Gagal menyalin: ", err);
+              toast.textContent = "Gagal menyalin!";
+              toast.classList.add("show");
+              setTimeout(() => {
+                toast.classList.remove("show");
+              }, 3000);
+            });
+        });
+
+        // Fungsi untuk menangani pemilihan file
+        function handleFileSelect() {
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+
+            // Update file info
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileType.textContent = file.type || "Unknown";
+
+            // Tampilkan info file
+            fileInfo.classList.add("active");
+
+            // Aktifkan tombol upload
+            uploadBtn.disabled = false;
+          }
+        }
+
+        // Fungsi untuk mengunggah file
+        async function uploadFile() {
+          const file = fileInput.files[0];
+          if (!file) return;
+
+          // Tampilkan loading
+          loading.classList.add("active");
+          initialState.style.display = "none";
+          uploadBtn.disabled = true;
+
+          // Baca file sebagai base64
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64 = reader.result.split(",")[1];
+
+            try {
+              // Kirim ke API
+              const response = await axios.post(
+                "https://api-upload-cyan.vercel.app/api/upload",
+                {
+                  fileName: file.name,
+                  content: base64,
+                },
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              // Sembunyikan loading
+              loading.classList.remove("active");
+
+              // Tampilkan hasil
+              const data = response.data.data;
+              resultFileName.textContent = data.fileName;
+              resultExtension.textContent = data.extension;
+              resultLink.textContent = data.url;
+              resultLink.href = data.url;
+
+              resultContent.classList.add("active");
+            } catch (error) {
+              // Sembunyikan loading
+              loading.classList.remove("active");
+
+              // Tampilkan pesan error
+              toast.textContent = `Error: ${error.response?.data?.error || error.message}`;
+              toast.classList.add("show");
+              setTimeout(() => {
+                toast.classList.remove("show");
+              }, 3000);
+
+              uploadBtn.disabled = false;
+            }
+          };
+
+          reader.readAsDataURL(file);
+        }
+
+        // Fungsi untuk menyalin tautan
+        function copyLink() {
+          const textarea = document.createElement("textarea");
+          textarea.value = resultLink.href;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textarea);
+
+          // Tampilkan toast notifikasi
+          toast.textContent = "Tautan berhasil disalin ke clipboard!";
+          toast.classList.add("show");
+          setTimeout(() => {
+            toast.classList.remove("show");
+          }, 3000);
+        }
+
+        // Fungsi untuk reset form
+        function resetForm() {
+          fileInput.value = "";
+          fileInfo.classList.remove("active");
+          uploadBtn.disabled = true;
+          resultContent.classList.remove("active");
+          initialState.style.display = "block";
+        }
+
+        // Fungsi untuk format ukuran file
+        function formatFileSize(bytes) {
+          if (bytes === 0) return "0 Bytes";
+          const k = 1024;
+          const sizes = ["Bytes", "KB", "MB", "GB"];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+      });
+    </script>
+  </body>
+</html>
