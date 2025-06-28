@@ -187,7 +187,6 @@
         box-shadow: none;
       }
 
-      /* PERBAIKAN UTAMA: Layout fleksibel untuk result-box */
       .result-box {
         background: rgba(15, 23, 42, 0.5);
         border-radius: 12px;
@@ -220,11 +219,16 @@
       }
 
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
-      /* PERBAIKAN: Tampilan link-box dan tombol salin */
       .link-box {
         background: rgba(15, 23, 42, 0.8);
         border-radius: 10px;
@@ -269,9 +273,10 @@
         background: rgba(59, 130, 246, 0.3);
       }
 
+      /* PERUBAHAN UTAMA: Layout file-details diubah menjadi vertikal */
       .file-details {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 15px;
         width: 100%;
       }
@@ -282,6 +287,7 @@
         padding: 15px;
         text-align: center;
         border: 1px solid rgba(255, 255, 255, 0.05);
+        width: 100%; /* Tambahkan agar memenuhi lebar */
       }
 
       .detail-card h3 {
@@ -450,7 +456,6 @@
         background: rgba(59, 130, 246, 0.3);
       }
 
-      /* Perbaikan tambahan untuk layout fleksibel */
       #initialState {
         display: flex;
         flex-direction: column;
@@ -461,34 +466,41 @@
         padding: 20px;
         flex-grow: 1;
       }
-      
+
+      /* PERUBAHAN: Layout tombol vertikal pada mobile */
       .action-buttons {
         display: flex;
         gap: 15px;
         width: 100%;
         margin-top: 15px;
       }
-      
+
       .action-buttons .upload-btn {
         margin-top: 0;
         flex: 1;
       }
 
-      /* Perbaikan untuk desktop: tinggi otomatis */
+      @media (max-width: 480px) {
+        .action-buttons {
+          flex-direction: column;
+        }
+      }
+
       @media (min-width: 769px) {
         .content {
           align-items: stretch;
         }
-        
-        .upload-section, .result-section {
+
+        .upload-section,
+        .result-section {
           display: flex;
           flex-direction: column;
         }
-        
+
         .upload-section > *:not(:last-child) {
           margin-bottom: 20px;
         }
-        
+
         .result-box {
           min-height: 300px;
         }
@@ -538,6 +550,7 @@
             </div>
 
             <div class="result-content" id="resultContent">
+              <!-- PERUBAHAN: Layout vertikal untuk detail file -->
               <div class="file-details">
                 <div class="detail-card">
                   <h3>Nama File</h3>
@@ -623,7 +636,7 @@
         copyBtn.addEventListener("click", copyLink);
         newUploadBtn.addEventListener("click", resetForm);
         viewFileBtn.addEventListener("click", () => {
-          window.open(resultLink.href, '_blank');
+          window.open(resultLink.href, "_blank");
         });
 
         // Fungsi untuk menangani pemilihan file
