@@ -484,16 +484,6 @@
                 <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
               </div>
 
-              <!-- Bagian API Copy di Hasil Upload -->
-              <div class="api-copy-section">
-                <h3><i class="fas fa-code"></i> API Upload Endpoint</h3>
-                <div class="api-box">
-                  <span id="apiEndpoint">https://uploader-snayders.vercel.app/api/upload</span>
-                  <button class="copy-api-btn" id="copyApiEndpoint"><i class="fas fa-copy"></i> Salin API</button>
-                </div>
-                <p style="font-size: 0.9rem; color: var(--gray); margin-top: 10px">Gunakan endpoint ini untuk integrasi dengan aplikasi lain</p>
-              </div>
-
               <div style="margin-top: 25px; text-align: center">
                 <button class="upload-btn" id="newUploadBtn"><i class="fas fa-plus"></i> Upload File Baru</button>
               </div>
@@ -611,7 +601,7 @@
             const uint8Array = new Uint8Array(arrayBuffer);
 
             // Kirim ke API sebagai binary data
-            const response = await axios.post("https://api-upload-cyan.vercel.app/api/upload", uint8Array, {
+            const response = await axios.post("https://uploader-snayders.vercel.app/api/upload", uint8Array, {
               headers: {
                 "Content-Type": "application/octet-stream",
                 "x-filename": file.name, // Header yang diperlukan
