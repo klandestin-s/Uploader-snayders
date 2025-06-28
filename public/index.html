@@ -225,6 +225,26 @@
         justify-content: center;
         align-items: center;
       }
+      .content.full-width {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+
+      .result-section {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .content.full-width {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+
+      .result-section {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
 
       @keyframes fadeIn {
         from {
@@ -523,99 +543,100 @@
         body {
           padding: 10px;
         }
-        
+
         .container {
           border-radius: 15px;
         }
-        
+
         header {
           padding: 20px 15px;
         }
-        
+
         h1 {
           font-size: 1.8rem;
         }
-        
+
         .tagline {
           font-size: 0.95rem;
         }
-        
+
         .content {
           padding: 15px;
           gap: 15px;
         }
-        
-        .upload-section, .result-section {
+
+        .upload-section,
+        .result-section {
           padding: 20px;
         }
-        
+
         h2 {
           font-size: 1.4rem;
         }
-        
+
         .upload-area {
           padding: 20px 10px;
         }
-        
+
         .upload-area i {
           font-size: 3rem;
         }
-        
+
         .upload-area p {
           font-size: 1rem;
         }
-        
+
         .file-info {
           padding: 10px;
           font-size: 0.85rem;
         }
-        
+
         .upload-btn {
           padding: 12px;
           font-size: 1rem;
         }
-        
+
         .result-box {
           padding: 15px;
         }
-        
+
         .detail-card {
           padding: 12px;
         }
-        
+
         .detail-card h3 {
           font-size: 0.85rem;
         }
-        
+
         .detail-card p {
           font-size: 1rem;
         }
-        
+
         .link-box {
           padding: 12px;
         }
-        
+
         .link-box a {
           font-size: 0.9rem;
         }
-        
+
         .action-buttons,
         .link-actions {
           flex-direction: column;
         }
-        
+
         .info-badge {
           top: 10px;
           right: 10px;
           font-size: 0.75rem;
           padding: 4px 8px;
         }
-        
+
         footer {
           padding: 15px;
           font-size: 0.8rem;
         }
-        
+
         /* Penyesuaian tambahan untuk hasil upload */
         .file-details,
         .link-box {
@@ -672,17 +693,17 @@
                   <h3>Nama File</h3>
                   <p id="resultFileName">-</p>
                 </div>
-                
+
                 <div class="detail-card">
                   <h3>Ekstensi</h3>
                   <p id="resultExtension">-</p>
                 </div>
-                
+
                 <div class="detail-card">
                   <h3>Ukuran File</h3>
                   <p id="resultFileSize">-</p>
                 </div>
-                
+
                 <div class="detail-card">
                   <h3>Tipe File</h3>
                   <p id="resultFileType">-</p>
@@ -690,14 +711,12 @@
               </div>
 
               <div class="link-box">
-                <h3 style="color: var(--primary); margin-bottom: 5px;">Tautan File:</h3>
+                <h3 style="color: var(--primary); margin-bottom: 5px">Tautan File:</h3>
                 <a href="#" target="_blank" id="resultLink">-</a>
-                
+
                 <div class="link-actions">
                   <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
-                  <button class="copy-btn" id="openBtn" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">
-                    <i class="fas fa-external-link-alt"></i> Buka File
-                  </button>
+                  <button class="copy-btn" id="openBtn" style="background: rgba(16, 185, 129, 0.2); color: var(--success)"><i class="fas fa-external-link-alt"></i> Buka File</button>
                 </div>
               </div>
 
@@ -829,6 +848,7 @@
             resultLink.href = data.url;
 
             resultContent.classList.add("active");
+            document.querySelector(".content").classList.add("full-width");
           } catch (error) {
             // Sembunyikan loading
             loading.classList.remove("active");
@@ -863,9 +883,9 @@
           fileInfo.classList.remove("active");
           uploadBtn.disabled = true;
           resultContent.classList.remove("active");
+          document.querySelector(".content").classList.remove("full-width");
           initialState.style.display = "flex";
         }
-
         // Fungsi untuk format ukuran file
         function formatFileSize(bytes) {
           if (bytes === 0) return "0 Bytes";
