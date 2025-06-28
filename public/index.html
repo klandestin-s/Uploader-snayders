@@ -185,15 +185,18 @@
         box-shadow: none;
       }
 
+      /* PERBAIKAN UTAMA: Set fixed height untuk result-box */
       .result-box {
         background: rgba(15, 23, 42, 0.5);
         border-radius: 12px;
         padding: 20px;
-        min-height: 200px;
+        min-height: 350px; /* Tinggi minimal yang konsisten */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        position: relative;
+        transition: min-height 0.3s ease;
       }
 
       .result-box p {
@@ -208,17 +211,27 @@
       }
 
       .result-content.active {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        animation: fadeIn 0.5s ease;
       }
 
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* PERBAIKAN: Tampilan link-box dan tombol salin */
       .link-box {
         background: rgba(15, 23, 42, 0.8);
         border-radius: 10px;
         padding: 15px;
-        margin-top: 15px;
         display: flex;
         align-items: center;
         border: 1px solid rgba(59, 130, 246, 0.3);
+        gap: 10px;
+        width: 100%;
       }
 
       .link-box a {
@@ -228,7 +241,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding-right: 10px;
+        padding: 8px 0;
       }
 
       .link-box a:hover {
@@ -240,12 +253,14 @@
         color: var(--primary);
         border: none;
         border-radius: 8px;
-        padding: 8px 15px;
+        padding: 10px 15px;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
         gap: 5px;
+        flex-shrink: 0;
+        min-width: 110px;
       }
 
       .copy-btn:hover {
@@ -256,7 +271,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 15px;
-        margin-top: 20px;
+        width: 100%;
       }
 
       .detail-card {
@@ -276,6 +291,7 @@
       .detail-card p {
         font-size: 1.1rem;
         font-weight: 600;
+        color: white;
       }
 
       .loading {
@@ -284,6 +300,14 @@
         align-items: center;
         justify-content: center;
         padding: 30px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 12px;
+        z-index: 10;
       }
 
       .loading.active {
@@ -423,12 +447,35 @@
       .copy-api-btn:hover {
         background: rgba(59, 130, 246, 0.3);
       }
+
+      /* Perbaikan tambahan untuk layout responsif */
+      #initialState {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100%;
+        padding: 20px;
+      }
+      
+      .action-buttons {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        margin-top: 15px;
+      }
+      
+      .action-buttons .upload-btn {
+        margin-top: 0;
+        flex: 1;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <header>
-        <div class="info-badge"><i class="fas fa-code-branch"></i> v2.1</div>
+        <div class="info-badge"><i class="fas fa-code-branch"></i> v2.2</div>
         <h1><i class="fas fa-cloud-upload-alt"></i> GitHub File Uploader</h1>
         <p class="tagline">Unggah file Anda dan dapatkan tautan yang dapat dibagikan secara instan</p>
       </header>
@@ -484,8 +531,9 @@
                 <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
               </div>
 
-              <div style="margin-top: 25px; text-align: center">
-                <button class="upload-btn" id="newUploadBtn"><i class="fas fa-plus"></i> Upload File Baru</button>
+              <div class="action-buttons">
+                <button class="upload-btn" id="newUploadBtn"><i class="fas fa-plus"></i> Upload Baru</button>
+                <button class="upload-btn" id="viewFileBtn" style="background: var(--success)"><i class="fas fa-eye"></i> Lihat File</button>
               </div>
             </div>
           </div>
@@ -517,10 +565,9 @@
         const resultLink = document.getElementById("resultLink");
         const copyBtn = document.getElementById("copyBtn");
         const newUploadBtn = document.getElementById("newUploadBtn");
+        const viewFileBtn = document.getElementById("viewFileBtn");
         const toast = document.getElementById("toast");
         const initialState = document.getElementById("initialState");
-        const copyApiEndpoint = document.getElementById("copyApiEndpoint");
-        const apiEndpoint = document.getElementById("apiEndpoint");
 
         // Event Listeners
         browseBtn.addEventListener("click", () => fileInput.click());
@@ -552,19 +599,8 @@
         uploadBtn.addEventListener("click", uploadFile);
         copyBtn.addEventListener("click", copyLink);
         newUploadBtn.addEventListener("click", resetForm);
-
-        // Event untuk tombol salin endpoint API
-        copyApiEndpoint.addEventListener("click", () => {
-          const apiUrl = apiEndpoint.textContent;
-          navigator.clipboard
-            .writeText(apiUrl)
-            .then(() => {
-              showToast("Link API berhasil disalin!");
-            })
-            .catch((err) => {
-              console.error("Gagal menyalin: ", err);
-              showToast("Gagal menyalin!");
-            });
+        viewFileBtn.addEventListener("click", () => {
+          window.open(resultLink.href, '_blank');
         });
 
         // Fungsi untuk menangani pemilihan file
@@ -585,7 +621,7 @@
           }
         }
 
-        // Fungsi untuk mengunggah file (VERSI DIPERBAIKI)
+        // Fungsi untuk mengunggah file
         async function uploadFile() {
           const file = fileInput.files[0];
           if (!file) return;
@@ -652,7 +688,7 @@
           fileInfo.classList.remove("active");
           uploadBtn.disabled = true;
           resultContent.classList.remove("active");
-          initialState.style.display = "block";
+          initialState.style.display = "flex";
         }
 
         // Fungsi untuk format ukuran file
