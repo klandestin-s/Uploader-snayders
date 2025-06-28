@@ -35,6 +35,14 @@
         align-items: center;
         width: 100%;
         overflow-x: hidden;
+        transition: background 1s ease; /* <--- Tambahkan ini */
+      }
+      body {
+        transition: background 1s ease;
+      }
+
+      body.success-bg {
+        background: linear-gradient(135deg, #10b981, #3b82f6, #10b981);
       }
 
       .container {
@@ -849,6 +857,7 @@
             resultContent.classList.add("active");
             document.querySelector(".content").classList.add("full-width");
             document.querySelector(".upload-section").style.display = "none";
+            document.body.classList.add("success-bg");
           } catch (error) {
             // Sembunyikan loading
             loading.classList.remove("active");
