@@ -20,9 +20,18 @@ module.exports = async (req, res) => {
   req.on('end', async () => {
     const buffer = Buffer.concat(chunks);
 
+    // Debugging: Log buffer size
+    console.log(`Received buffer size: ${buffer.length} bytes`);
+    
     const fileName = req.headers['x-filename'];
-    if (!fileName || !buffer.length) {
-      return res.status(400).json({ error: 'Header x-filename dan body buffer wajib diisi' });
+    if (!fileName) {
+      console.error('x-filename header missing');
+      return res.status(400).json({ error: 'Header x-filename wajib diisi' });
+    }
+    
+    if (!buffer || buffer.length === 0) {
+      console.error('Empty buffer received');
+      return res.status(400).json({ error: 'Body buffer wajib diisi' });
     }
 
     const extension = fileName.includes('.') ? fileName.split('.').pop() : 'bin';
